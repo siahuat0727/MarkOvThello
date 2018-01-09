@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import time
 
-np.random.seed(3)  # reproducible
+np.random.seed(2)  # reproducible
 
 
 N_STATES = 7   # the length of the 1 dimensional world
@@ -17,18 +17,21 @@ FRESH_TIME = 0.1    # fresh time for one move
 A_TREASURE = 0
 B_TREASURE = N_STATES - 1
 
+def next_player(player):
+    return 'A' if player == 'B' else 'B'
 
 def get_env_feedback(S, A, player):
     # This is how agent will interact with the environment
     if A == 'left' and int(S[0]) > A_TREASURE:  
-        S_ = str(int(S[0])-1) + player
+        S_ = str(int(S[0])-1)
     elif A == 'right' and int(S[0]) < B_TREASURE:
-        S_ = str(int(S[0])+1) + player
+        S_ = str(int(S[0])+1)
     else:
-        S_ = S[0] + player
+        S_ = S[0]
+    S_ += next_player(player)
 
     if int(S_[0]) == A_TREASURE or int(S_[0]) == B_TREASURE:
-        if player == 'A' and int(S_[0]) == A_TREASURE:
+        if (player == 'A' and int(S_[0]) == A_TREASURE) or (player == 'B' and int(S_[0]) == B_TREASURE):
             R = 1
         else:
             R = -1
@@ -43,9 +46,9 @@ def update_env(S, episode, step_counter, player, win_lose=''):
     env_list = ['A'] + ['-']*(N_STATES-2) + ['B']   # '---------T' our environment
     if S == 'terminal':
         interaction = 'Episode %s: total_steps = %s ' % (episode+1, step_counter) + win_lose
-        print('\r{}'.format(interaction), end='')
-        time.sleep(2)
-        print('\r                                  ', end='')
+        print('\r{}'.format(interaction))#, end='')
+        # time.sleep(2)
+        # print('\r                                  ', end='')
     else:
         env_list[int(S[0])] = 'a' if player == 'A' else 'b'
         interaction = ''.join(env_list)
@@ -62,7 +65,8 @@ def rl(start_player='A', change_player=False):
         is_terminated = False
         update_env(S, episode, step_counter, player)
         while not is_terminated:
-            S = ''.join(S[0] + player)
+            if S != ''.join(S[0] + player):
+                print("sth, wrong!!", end='\n\n')
             A = table.choose_action(S)
             S_, R = get_env_feedback(S, A, player)  # take action & get next state and reward
             table.learn(S, A, R, S_)
@@ -73,9 +77,10 @@ def rl(start_player='A', change_player=False):
             if S_ == 'terminal':
                 is_terminated = True
             step_counter += 1
-            player = 'A' if player == 'B' else 'B'
+            player = next_player(player)
 
         print('\n', table.q_table.sort_index(axis=0), end='\n\n')
+        time.sleep(2)
     return table
 
 if __name__ == "__main__":

@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd
 
 class MDPTable:
-    def __init__(self, actions, learning_rate=0.9, greedy=0.9):
+    def __init__(self, actions, learning_rate=0.9, reward_decay=0.9, greedy=0.9):
         self.actions = actions
         self.learning_rate = learning_rate
+        self.gamma = reward_decay
         self.greedy = greedy
         self.q_table = pd.DataFrame(columns = self.actions, dtype=np.float64)
 
@@ -23,7 +24,7 @@ class MDPTable:
         self.check_state_exist(s_)
         q_old = self.q_table.ix[s, a]
         if s_ != 'terminal':
-            q_new = r + self.q_table.ix[s_, :].max()  # next state is not terminal
+            q_new = - r - self.gamma * self.q_table.ix[s_, :].max()
         else:
             q_new = r
         self.q_table.ix[s, a] += self.learning_rate * (q_new - q_old)
