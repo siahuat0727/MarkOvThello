@@ -1,10 +1,9 @@
-from qlearning import MDPTable
+from MDP import QLearning
 import numpy as np
 import pandas as pd
 import time
 
 np.random.seed(2)  # reproducible
-
 
 N_STATES = 7   # the length of the 1 dimensional world
 INIT_STATE = N_STATES // 2
@@ -13,12 +12,15 @@ EPSILON = 0.9   # greedy police
 ALPHA = 0.1     # learning rate
 GAMMA = 0.9    # discount factor
 MAX_EPISODES = 13   # maximum episodes
-FRESH_TIME = 0.1    # fresh time for one move
+FRESH_TIME = 0.4    # fresh time for one move
 A_TREASURE = 0
 B_TREASURE = N_STATES - 1
 
 def next_player(player):
     return 'A' if player == 'B' else 'B'
+
+def place_of_state(state):
+    return int(state[0])
 
 def get_env_feedback(S, A, player):
     # This is how agent will interact with the environment
@@ -30,15 +32,14 @@ def get_env_feedback(S, A, player):
         S_ = S[0]
     S_ += next_player(player)
 
-    if int(S_[0]) == A_TREASURE or int(S_[0]) == B_TREASURE:
-        if (player == 'A' and int(S_[0]) == A_TREASURE) or (player == 'B' and int(S_[0]) == B_TREASURE):
+    if place_of_state(S_) == A_TREASURE or place_of_state(S_) == B_TREASURE:
+        if (player == 'A' and place_of_state(S_) == A_TREASURE) or (player == 'B' and place_of_state(S_) == B_TREASURE):
             R = 1
         else:
             R = -1
         S_ = 'terminal'
     else:
         R = 0
-
     return S_, R
 
 def update_env(S, episode, step_counter, player, win_lose=''):
@@ -50,14 +51,14 @@ def update_env(S, episode, step_counter, player, win_lose=''):
         # time.sleep(2)
         # print('\r                                  ', end='')
     else:
-        env_list[int(S[0])] = 'a' if player == 'A' else 'b'
+        env_list[place_of_state(S)] = player.lower()
         interaction = ''.join(env_list)
         print('\r{}'.format(interaction), end='')
         time.sleep(FRESH_TIME)
 
 def rl(start_player='A', change_player=False):
     # main part of RL loop
-    table = MDPTable(ACTIONS)
+    table = QLearning(ACTIONS)
     for episode in range(MAX_EPISODES):
         player = start_player 
         step_counter = 0
