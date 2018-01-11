@@ -54,7 +54,7 @@ def rl_no_window(episode):
                 break
             color ^= 1
             S = S_
-        if (x + 1) % 200 == 0:
+        if (x + 1) % 50 == 0:
             board.board_initialize()
             pos_can_go_s = board.where_can_go(board.black)
             color = board.black
