@@ -8,9 +8,6 @@ np.random.seed(2)  # reproducible
 N_STATES = 7   # the length of the 1 dimensional world
 INIT_STATE = N_STATES // 2
 ACTIONS = ['left', 'right', 'stay']     # available actions
-EPSILON = 0.9   # greedy police
-ALPHA = 0.1     # learning rate
-GAMMA = 0.9    # discount factor
 MAX_EPISODES = 13   # maximum episodes
 FRESH_TIME = 0.4    # fresh time for one move
 A_TREASURE = 0
@@ -44,7 +41,7 @@ def get_env_feedback(S, A, player):
 
 def update_env(S, episode, step_counter, player, win_lose=''):
     # This is how environment be updated
-    env_list = ['A'] + ['-']*(N_STATES-2) + ['B']   # '---------T' our environment
+    env_list = ['A'] + ['-']*(N_STATES-2) + ['B']   # 'A--------B' our environment
     if S == 'terminal':
         interaction = 'Episode %s: total_steps = %s ' % (episode+1, step_counter) + win_lose
         print('\r{}'.format(interaction))#, end='')
@@ -56,7 +53,7 @@ def update_env(S, episode, step_counter, player, win_lose=''):
         print('\r{}'.format(interaction), end='')
         time.sleep(FRESH_TIME)
 
-def rl(start_player='A', change_player=False):
+def rl(start_player='A'):
     # main part of RL loop
     table = QLearning(ACTIONS)
     for episode in range(MAX_EPISODES):

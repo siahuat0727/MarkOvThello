@@ -1,13 +1,15 @@
 from board import Board
 from MDP import QLearning
 import time
+from window import Window
 
 ACTIONS = [i for i in range(12)]
 MAX_EPISODES = 1
 
 def rl(table):
     for x in range(MAX_EPISODES):
-        board = Board(6)
+        board = Board(4)
+        window = Window(board)
         color = Board.black
         no_move = 0
         while no_move < 2:
@@ -23,6 +25,7 @@ def rl(table):
             board.print_board()
             color ^= 1
             time.sleep(0.3)
+            window.update_all(board)
 
 if __name__ == '__main__':
     table = QLearning(actions=ACTIONS)
