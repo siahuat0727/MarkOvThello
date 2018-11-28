@@ -19,11 +19,17 @@ Actions   : left, right
 
 Terminal  : found treasure
 
-learning function
+Learning function:
+```python
+def learn(self, s, a, r, s_):
+    self.check_state_exist(s_)
+    q_old = self.q_table.ix[s, a]
+    if s_ != 'terminal':
+        q_new = r + self.gamma * self.q_table.ix[s_, :].max()
+    else:
+        q_new = r
+    self.q_table.ix[s, a] += self.learning_rate * (q_new - q_old)
 ```
-
-```
-[video link]()
 
 Reference: [莫烦python](https://morvanzhou.github.io/tutorials/machine-learning/reinforcement-learning/)
 
@@ -43,12 +49,17 @@ Actions   : left, right, *stay*
 
 Terminal  : anyone found any treasure
 
-leaning function
+Leaning function:
+```python
+def learn(self, s, a, r, s_):
+    self.check_state_exist(s_)
+    q_old = self.q_table.ix[s, a]
+    if s_ != 'terminal':
+        q_new = - (r + self.gamma * self.q_table.ix[s_, :].max())
+    else:
+        q_new = r
+    self.q_table.ix[s, a] += self.learning_rate * (q_new - q_old)
 ```
-
-```
-[video link]()
-
 ### 小插曲
 
 ![](img/xiaochaqu.png)
@@ -69,10 +80,23 @@ Actions   : legal steps
 
 Terminal  : no one has legal steps
 
-leaning function
+Leaning function:
+```python
+def learn(self, s, a, r, s_, pos_can_go_s):
+    self.check_state_exist(s_)
+    if a == (-1, -1):
+        return
+    q_old = self.q_table.ix[s, a]
+    if s_ != 'terminal':
+        if not pos_can_go_s:
+            s__ = s_[:-1] + str(int(s_[-1]) ^ 1)
+            self.check_state_exist(s__)
+            q_new = - r + self.gamma * self.q_table.ix[s__, :].max()
+        else:
+            q_new = - (r + self.gamma * self.q_table.ix[s_, pos_can_go_s].max())
+    else:
+        q_new = r
+    self.q_table.ix[s, a] += self.learning_rate * (q_new - q_old)
 ```
-
-```
-[video link]()
 
 
